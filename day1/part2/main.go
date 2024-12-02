@@ -32,11 +32,6 @@ func main() {
 	left_frequencies := map[int]int{}
 	right_frequencies := map[int]int{}
 
-	// if val, ok := left_right_frequencies[4]; !ok {
-	// 	fmt.Println(val, ok)
-    // }
-
-
 	for _, line := range lines {
 		nums := strings.Split(line, "   ")
 
