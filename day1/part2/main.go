@@ -1,5 +1,7 @@
 package main
 
+// https://adventofcode.com/2024/day/1
+
 import (
 	"fmt"
 	"os"
