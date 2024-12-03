@@ -9,6 +9,57 @@ import (
 	"strings"
 )
 
+func toInt(x string) int {
+	y, _ := strconv.Atoi(x)
+	return y
+}
+
+func removeAtIndex(list []string, i int) []string {
+	left := list[0:i]
+	right := list[i+1:]
+
+	var new_list []string
+	for _, v := range left {
+		new_list = append(new_list, v)
+	}
+	for _, v := range right {
+		new_list = append(new_list, v)
+	}
+
+	return new_list
+}
+
+func isReportSafe(levels []string) bool {
+	first_level := toInt(levels[0])
+	second_level := toInt(levels[1])
+
+	var is_increasing bool
+	if second_level > first_level {
+		is_increasing = true
+	} else if second_level < first_level {
+		is_increasing = false // is decreasing
+	} else {
+		return false
+	}
+
+	prev_level := first_level
+	for i := 1; i < len(levels); i++ {
+		level := toInt(levels[i])
+
+		ordering_changed := (is_increasing && level < prev_level) || (!is_increasing && level > prev_level)
+		no_difference := level-prev_level == 0
+		big_difference := (is_increasing && level-prev_level > 3) || (!is_increasing && prev_level-level > 3)
+
+		if ordering_changed || no_difference || big_difference {
+			return false
+		}
+
+		prev_level = level
+	}
+
+	return true
+}
+
 func Part1(input string) int {
 	reports := strings.Split(input, "\n")
 	safe_reports := 0
@@ -16,39 +67,11 @@ func Part1(input string) int {
 	for _, report := range reports {
 		levels := strings.Split(report, " ")
 
-		first_level, _ := strconv.Atoi(levels[0])
-		second_level, _ := strconv.Atoi(levels[1])
-
-		var is_increasing bool
-		if second_level > first_level {
-			is_increasing = true
-		} else if second_level < first_level {
-			is_increasing = false
-		} else {
-			continue // unsafe
-		}
-
-		prev_level := first_level
-		safe := true
-		for i := 1; i < len(levels); i++ {
-			level, _ := strconv.Atoi(levels[i])
-
-			ordering_changed := (is_increasing && level < prev_level) || (!is_increasing && level > prev_level)
-			no_difference := level - prev_level == 0
-			big_difference := (is_increasing && level - prev_level > 3) || (!is_increasing && prev_level - level > 3)
-
-			if ordering_changed || no_difference || big_difference {
-				safe = false
-				break
-			}
-
-			prev_level = level
-		}
-
-		if safe {
+		if isReportSafe(levels) {
 			safe_reports++
 		}
 	}
+
 	return safe_reports
 }
 
@@ -57,53 +80,17 @@ func Part2(input string) int {
 	safe_reports := 0
 
 	for _, report := range reports {
-		levels_2 := strings.Split(report, " ")
+		levels := strings.Split(report, " ")
 
-		for i := -1; i < len(levels_2); i++ {
-			var levels []string
+		for i := -1; i < len(levels); i++ {
+			var modified_levels []string
 			if i == -1 {
-				levels = levels_2
+				modified_levels = levels
 			} else {
-				left := levels_2[0:i]
-				right := levels_2[i+1:]
-				for _, v := range left {
-					levels = append(levels, v)
-				}
-				for _, v := range right {
-					levels = append(levels, v)
-				}
+				modified_levels = removeAtIndex(levels, i)
 			}
 
-			first_level, _ := strconv.Atoi(levels[0])
-			second_level, _ := strconv.Atoi(levels[1])
-
-			var is_increasing bool
-			if second_level > first_level {
-				is_increasing = true
-			} else if second_level < first_level {
-				is_increasing = false
-			} else {
-				continue // unsafe
-			}
-
-			prev_level := first_level
-			safe := true
-			for i := 1; i < len(levels); i++ {
-				level, _ := strconv.Atoi(levels[i])
-
-				ordering_changed := (is_increasing && level < prev_level) || (!is_increasing && level > prev_level)
-				no_difference := level - prev_level == 0
-				big_difference := (is_increasing && level - prev_level > 3) || (!is_increasing && prev_level - level > 3)
-
-				if ordering_changed || no_difference || big_difference {
-					safe = false
-					break
-				}
-
-				prev_level = level
-			}
-
-			if safe {
+			if isReportSafe((modified_levels)) {
 				safe_reports++
 				break
 			}
